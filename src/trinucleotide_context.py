@@ -152,11 +152,15 @@ def create_96_matrix(snv_data: pd.DataFrame) -> np.ndarray:
     # Freeze ordering
     counts_wide = counts_wide.reindex(columns = CHANNELS_96, fill_value = 0)
 
-    # Count SNPs per sample, and store as metadata
+    # Count SNVs per sample, and store as metadata
     counts_wide.attrs["n_snv"] = counts_wide.sum(axis=1).to_dict()
 
-    # # Also store as metadata the cancer type ("prioject_name")
-    # project_dict = snv_data.drop_duplicates(subset=['Tumor_Sample_Barcode'])[['Tumor_Sample_Barcode', 'project_name']].set_index('Tumor_Sample_Barcode')['project_name'].to_dict()
-    # counts_wide.attrs["project_name"] = project_dict
+    # Also store cancer type as metadata
+    cancer_type_dict = (
+        snv_data.groupby("Tumor_Sample_Barcode", sort=False)["project_name"]
+        .first()
+        .to_dict()
+    )
+    counts_wide.attrs["cancer_type"] = cancer_type_dict
 
     return counts_wide
