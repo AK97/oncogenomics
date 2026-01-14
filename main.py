@@ -55,6 +55,8 @@ Now we have
 
 # splice sample ids to first 16 chars, to match
 learned_exposures.index = learned_exposures.index.astype(str).str[:16]
+# average scores to remove what are now replicates
+learned_exposures = learned_exposures.groupby(level=0, sort=False).mean()
 
 # overlapping samples - those with mutational signatures and pathway data
 common_samples = learned_exposures.index.intersection(ssgsea_scores.index)
@@ -67,20 +69,15 @@ learned_exposures = clr(learned_exposures)
 # print(learned_exposures.head())
 sp = standardize_pathways(ssgsea_scores)
 
-print(len(learned_exposures)) #612
-print(len(set(learned_exposures.index))) #585
-
-# # combine data thus far into one matrix
-# aggregated_data = pd.concat(
-#     [
-#         learned_exposures,
-#         sp,
-#         pd.Series(n_snv_map, name="n_snv"),
-#         pd.Series(cancer_type_map, name="cancer_type"),
-#     ],
-#     axis=1,
-#     join="inner",
-# )
-
-# print(aggregated_data.columns)
-# print(aggregated_data.head())
+# combine data thus far into one matrix (543 x 149)
+aggregated_data = pd.concat(
+    [
+        learned_exposures,
+        sp,
+        pd.Series(n_snv_map, name="n_snv"),
+        pd.Series(cancer_type_map, name="cancer_type"),
+    ],
+    axis=1,
+    join="inner",
+)
+print(aggregated_data.shape)
