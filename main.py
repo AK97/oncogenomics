@@ -7,6 +7,7 @@ from src.cosmic import filter_snv_counts, import_cosmic_signatures, run_nnls
 from src.rna_seq import get_rna_seq_for_samples, build_counts_matrix, normalize_and_filter_rna_seq
 from src.pathway_scoring import import_pathway_map, score_ssgsea
 from src.modeling import clr, standardize_pathways
+from src.regression import create_linreg_model
 
 tumor_maf_data = load_and_merge_maf_files()
 
@@ -19,12 +20,12 @@ cosmic_canonicals = create_cosmic_channels(with_trinucleotide_context)
 sample_key = sample_proj_snp_key(with_trinucleotide_context)
 mat96 = create_96_matrix(cosmic_canonicals)
 
-# store metadata as maps. use 16 dig sample ids
-n_snv_map = {k[:16]: v for k, v in mat96.attrs["n_snv"].items()}
-cancer_type_map = {k[:16]: v for k, v in mat96.attrs["cancer_type"].items()}
-
 filtered_snv_counts = filter_snv_counts(mat96)
 # at threshold 100, 612 samples remain
+
+# store metadata as maps. use 16 dig sample ids
+n_snv_map = {k[:16]: v for k, v in filtered_snv_counts.attrs["n_snv"].items()}
+cancer_type_map = {k[:16]: v for k, v in filtered_snv_counts.attrs["cancer_type"].items()}
 
 cosmic_signatures = import_cosmic_signatures()
 
@@ -67,17 +68,16 @@ common_samples = learned_exposures.index.intersection(ssgsea_scores.index)
 learned_exposures = clr(learned_exposures)
 
 # print(learned_exposures.head())
-sp = standardize_pathways(ssgsea_scores)
+sp = standardize_pathways(ssgsea_scores) # (543 x 50)
 
-# combine data thus far into one matrix (543 x 149)
-aggregated_data = pd.concat(
-    [
-        learned_exposures,
-        sp,
-        pd.Series(n_snv_map, name="n_snv"),
-        pd.Series(cancer_type_map, name="cancer_type"),
-    ],
-    axis=1,
-    join="inner",
+# linear regression
+model = create_linreg_model(
+    (learned_exposures, n_snv_map, cancer_type_map),
+    sp
 )
-print(aggregated_data.shape)
+print("Model Coefficients:")
+print(model.coef_)
+print("\nModel Intercept:")
+print(model.intercept_)
+print("\nModel Parameters (alpha):")
+print(model.alpha) # Note: alpha is a hyperparameter, not an attribute after fitting

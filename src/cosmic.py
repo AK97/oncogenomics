@@ -7,9 +7,12 @@ from scipy.optimize import nnls
 def filter_snv_counts(mat96:pd.DataFrame, min_count:int = 100) -> pd.DataFrame:
     
     n_snv = pd.Series(mat96.attrs["n_snv"], name = "n_snv")
+    cancer_type = pd.Series(mat96.attrs["cancer_type"], name = "cancer_type")
 
     desired = n_snv[n_snv >= min_count].index
     mat96_filtered = mat96.loc[desired]
+    mat96_filtered.attrs["n_snv"] = n_snv.loc[desired]
+    mat96_filtered.attrs["cancer_type"] = cancer_type.loc[desired]
     return mat96_filtered
 
 def import_cosmic_signatures() -> pd.DataFrame:
