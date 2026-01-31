@@ -1,6 +1,5 @@
 import pandas as pd
 from pathlib import Path
-import glob
 import requests
 
 def get_project_ids(sample_ids: pd.Series) -> pd.Series:

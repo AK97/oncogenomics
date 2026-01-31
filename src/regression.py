@@ -32,6 +32,13 @@ def create_linreg_model(inputs: tuple, responses: pd.DataFrame) -> Ridge:
     predictors = predictors.loc[common_samples]
     responses = responses.loc[common_samples]
 
+    data_export = pd.concat(
+        (predictors, responses),
+        axis = 1
+    )
+    data_export.to_csv('output/aggr_data.csv')
+    quit()
+
     encoder = OneHotEncoder(
         drop = "first",
         handle_unknown = "ignore",
@@ -53,7 +60,7 @@ def create_linreg_model(inputs: tuple, responses: pd.DataFrame) -> Ridge:
             predictors.drop(columns=["cancer_type"]),
             c_type_df
         ],
-        axis=1
+        axis = 1
     )
 
     print(f"X matrix: {predictors.shape}")

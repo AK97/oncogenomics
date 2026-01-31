@@ -2,7 +2,6 @@ import pandas as pd
 
 from src.merge_mafs import load_and_merge_maf_files
 from src.trinucleotide_context import import_reference_genome, add_trinuc_context, create_cosmic_channels, create_96_matrix, sample_proj_snp_key
-from src.channels import CHANNELS_96
 from src.cosmic import filter_snv_counts, import_cosmic_signatures, run_nnls
 from src.rna_seq import get_rna_seq_for_samples, build_counts_matrix, normalize_and_filter_rna_seq
 from src.pathway_scoring import import_pathway_map, score_ssgsea
@@ -17,7 +16,7 @@ with_trinucleotide_context = add_trinuc_context(tumor_maf_data, ref_genome)
 
 cosmic_canonicals = create_cosmic_channels(with_trinucleotide_context)
 
-sample_key = sample_proj_snp_key(with_trinucleotide_context)
+# sample_key = sample_proj_snp_key(with_trinucleotide_context)
 mat96 = create_96_matrix(cosmic_canonicals)
 
 filtered_snv_counts = filter_snv_counts(mat96)
@@ -47,12 +46,11 @@ normalized_counts = normalize_and_filter_rna_seq(counts_matrix)
 pathway_map = import_pathway_map()
 ssgsea_scores = score_ssgsea(normalized_counts, pathway_map)
 
-'''
-Now we have
-- mutational signatures (learned_exposures)
-- pathway activity (ssgsea_scores)
-- sample metadata (project_name, n_snv)
-'''
+
+# Now we have
+# - mutational signatures (learned_exposures)
+# - pathway activity (ssgsea_scores)
+# - sample metadata (cancer_type, n_snv)
 
 # splice sample ids to first 16 chars, to match
 learned_exposures.index = learned_exposures.index.astype(str).str[:16]
@@ -64,7 +62,7 @@ common_samples = learned_exposures.index.intersection(ssgsea_scores.index)
 
 # 612 with mut sigs, 543 with pathway data; 543 overlap
 
-# use centered log transform to avoid multilinearity in SBS data
+# use centered log transform to avoid multilinearity in SBS data # but not for frac exp visualization
 learned_exposures = clr(learned_exposures)
 
 # print(learned_exposures.head())
@@ -80,4 +78,4 @@ print(model.coef_)
 print("\nModel Intercept:")
 print(model.intercept_)
 print("\nModel Parameters (alpha):")
-print(model.alpha) # Note: alpha is a hyperparameter, not an attribute after fitting
+print(model.alpha) # hyperparam
