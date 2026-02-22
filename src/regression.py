@@ -28,17 +28,6 @@ def create_linreg_model(inputs: tuple, responses: pd.DataFrame) -> Ridge:
         join = "inner"
     )
 
-    common_samples = predictors.index.intersection(responses.index)
-    predictors = predictors.loc[common_samples]
-    responses = responses.loc[common_samples]
-
-    data_export = pd.concat(
-        (predictors, responses),
-        axis = 1
-    )
-    data_export.to_csv('output/aggr_data.csv')
-    quit()
-
     encoder = OneHotEncoder(
         drop = "first",
         handle_unknown = "ignore",

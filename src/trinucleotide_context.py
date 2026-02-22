@@ -128,7 +128,7 @@ def sample_proj_snp_key(snv_data: pd.DataFrame) -> pd.DataFrame:
 def create_96_matrix(snv_data: pd.DataFrame) -> np.ndarray:
     """
     Create 96-channel matrix from SNV data.
-    Each row corresponds to a single SNV, and each column corresponds to a channel.
+    Each row corresponds to a single sample, and each column corresponds to a channel.
     Channels are ordered as per source of truth file (CHANNELS_96).
     """
 

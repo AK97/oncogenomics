@@ -59,3 +59,27 @@ def run_nnls(mutation_matrix: pd.Series, signatures: pd.DataFrame) -> pd.Series:
 
     fractional_exposures = Exp.div(Exp.sum(axis=1), axis=0)
     return fractional_exposures
+
+def build_signature_channel_matrix(
+    cosmic_signatures: pd.DataFrame,
+    learned_exposures: pd.DataFrame
+) -> pd.DataFrame:
+    """
+    Build a signatures x 96-channel matrix aligned to learned_exposures columns.
+    """
+    if "Type" in cosmic_signatures.columns:
+        cosmic_profiles = cosmic_signatures.set_index("Type")
+    else:
+        cosmic_profiles = cosmic_signatures.copy()
+
+    missing_signatures = learned_exposures.columns.difference(cosmic_profiles.columns)
+    if not missing_signatures.empty:
+        raise ValueError(
+            "Missing signatures in cosmic_signatures: "
+            + ", ".join(missing_signatures.astype(str))
+        )
+
+    channel_matrix = cosmic_profiles[learned_exposures.columns].T
+    channel_matrix.index.name = "signature"
+    channel_matrix.columns.name = "channel"
+    return channel_matrix

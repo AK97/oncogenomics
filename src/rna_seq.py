@@ -12,6 +12,9 @@ def get_rna_seq_for_samples(samples:pd.DataFrame) -> pd.DataFrame:
 
     if Path('data/rna_seq_data_for_manifest.parquet').exists():
         return pd.read_parquet('data/rna_seq_data_for_manifest.parquet')
+    
+    print("Warning: API querying is about to begin. This may take a while.")
+    input("Press Enter to continue...")
 
     URL = 'https://api.gdc.cancer.gov/files'
 

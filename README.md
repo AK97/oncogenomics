@@ -34,3 +34,14 @@ Plotting mutational signatures show some positive QA results.
 - SBS2 and SBS13 are APOBEC-related, which are extremely common in breast cancer. This result makes sense.
 - KIRC should show some clock-like signal but it is thought that SNVs are not the primary driver. The lack of strong result is problematic but makes a little sense.
 - Clearly we have an issue of Signature Bleed: We are testing on too many SBS, which was intentional to avoid bias, but it is sensible to apply filtering to eliminate this noise.
+
+### Figure 2
+| Figure 2A | Figure 2B |
+|---|---|
+| ![Figure 2a](/figures/CosineSimilarity.png "Cosine Similarity") | ![Figure 2b](/figures/SimilarityVsSNV.png "Similarity vs SNV Counts") |
+
+SBS Decomposition Quality Check looks strong and internally consistent.
+- We reconstructed each sample's 96-channel profile from learned exposures and compared it to the original profile.
+- Figure 2A shows cosine similarities concentrated near 1.0, indicating high-fidelity reconstruction for most samples.
+- Figure 2B shows lower cosine similarity is associated with lower SNV burden, which is expected because low-count samples have noisier channel estimates.
+- The learned SBS exposures are thus likely capturing real mutational structure rather than random artifacts.
